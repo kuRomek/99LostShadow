@@ -1,3 +1,4 @@
+using Misc;
 using StructureElements;
 using UnityEngine;
 
@@ -19,35 +20,30 @@ namespace PlayerControl
 
         public void Enable()
         {
-            Model.Jumped += AddJumpingForce;
-            Model.WalkingStateChanged += View.SetWalkingAnimation;
-            Model.LookedLeft += View.MirrorSprite;
+            Model.Movement.WalkingStateChanged += View.SetWalkingAnimation;
+            Model.Movement.LookedLeft += View.MirrorSprite;
+            Model.Movement.Jumped += View.SetJumpingAnimation;
+            Model.Movement.Soaring += View.SetSoaringState;
+            _groundDetector.HasGrounded += View.SetGroundedState;
             Model.AttackHandler.AttackStarted += View.SetAttackingState;
             Model.AttackHandler.AttackStopped += View.RemoveAttackingState;
-            Model.AttackHandler.AttackingCombo1 += View.SetAttackCombo1Animation;
-            Model.AttackHandler.AttackingCombo2 += View.SetAttackCombo2Animation;
-            Model.AttackHandler.AttackingCombo3 += View.SetAttackCombo3Animation;
+            
+            for (int i = 0; i < Model.AttackHandler.AttackingCombo.Length; i++)
+                Model.AttackHandler.AttackingCombo[i] += View.SetAttackComboAnimation;
         }
 
         public void Disable()
         {
-            Model.Jumped -= AddJumpingForce;
-            Model.WalkingStateChanged -= View.SetWalkingAnimation;
-            Model.LookedLeft -= View.MirrorSprite;
+            Model.Movement.WalkingStateChanged -= View.SetWalkingAnimation;
+            Model.Movement.LookedLeft -= View.MirrorSprite;
+            Model.Movement.Jumped -= View.SetJumpingAnimation;
+            Model.Movement.Soaring -= View.SetSoaringState;
+            _groundDetector.HasGrounded -= View.SetGroundedState;
             Model.AttackHandler.AttackStarted -= View.SetAttackingState;
             Model.AttackHandler.AttackStopped -= View.RemoveAttackingState;
-            Model.AttackHandler.AttackingCombo1 -= View.SetAttackCombo1Animation;
-            Model.AttackHandler.AttackingCombo2 -= View.SetAttackCombo2Animation;
-            Model.AttackHandler.AttackingCombo3 -= View.SetAttackCombo3Animation;
-        }
 
-        private void AddJumpingForce(float jumpForce)
-        {
-            if (_groundDetector.IsOnGround)
-            {
-                View.SetJumpingAnimation();
-                _rigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-            }
+            for (int i = 0; i < Model.AttackHandler.AttackingCombo.Length; i++)
+                Model.AttackHandler.AttackingCombo[i] -= View.SetAttackComboAnimation;
         }
     }
 }

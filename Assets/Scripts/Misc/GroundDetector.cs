@@ -1,20 +1,29 @@
+using System;
 using UnityEngine;
 
-public class GroundDetector : MonoBehaviour
+namespace Misc
 {
-    private const string Ground = nameof(Ground);
-
-    public bool IsOnGround { get; private set; } = false;
-
-    private void OnTriggerEnter2D(Collider2D other)
+    public class GroundDetector : MonoBehaviour
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer(Ground))
-            IsOnGround = true;
-    }
+        private const string Ground = nameof(Ground);
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.gameObject.layer == LayerMask.NameToLayer(Ground))
-            IsOnGround = false;
+        public event Action HasGrounded;
+
+        public bool IsOnGround { get; private set; } = false;
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer(Ground))
+            {
+                IsOnGround = true;
+                HasGrounded?.Invoke();
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            if (other.gameObject.layer == LayerMask.NameToLayer(Ground))
+                IsOnGround = false;
+        }
     }
 }

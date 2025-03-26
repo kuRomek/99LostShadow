@@ -1,88 +1,75 @@
 ﻿using AttackSystem;
 using Input;
+using Misc;
 using StructureElements;
 using System;
+using UnityEngine;
 
 namespace PlayerControl
 {
     public class PlayerAttackHandler : AttackHandler, IUpdatable
     {
-        private int _attackingState = 0;
+        private int _attackComboNumber = 0;
         private float _accumTime = 0f;
+        private GroundDetector _groundDetector;
 
-        public PlayerAttackHandler(InputController input, PlayerParameters parameters) :
+        public PlayerAttackHandler(InputController input, PlayerParameters parameters, GroundDetector groundDetector) :
             base(input, parameters)
         {
+            AttackingCombo = new EventElement<int>[parameters.AttackComboElements.Length];
+
+            for (int i = 0; i < AttackingCombo.Length; i++)
+                AttackingCombo[i] = new EventElement<int>();
+
+            _groundDetector = groundDetector;
         }
 
         public event Action AttackStarted;
-        public event Action AttackStopped;
-        public event Action AttackingCombo1;
-        public event Action AttackingCombo2;
-        public event Action AttackingCombo3;
+        public event Action<bool> AttackStopped;
+        public EventElement<int>[] AttackingCombo;
 
-        protected new PlayerParameters Parameters => base.Parameters as PlayerParameters;
+        public int AttackingState => _attackComboNumber;
+        protected new PlayerParameters Params => base.Params as PlayerParameters;
 
         public void Update(float deltaTime)
         {
-            if (_attackingState != 0)
+            if (_attackComboNumber != 0)
                 _accumTime += deltaTime;
 
-            if (_attackingState == 1 && _accumTime - Parameters.AttackCombo1Cooldown > Parameters.WaitingForComboTime)
-            {
-                _attackingState = 0;
-                _accumTime = 0f;
-                AttackStopped?.Invoke();
-            }
-            else if (_attackingState == 2 && _accumTime - Parameters.AttackCombo2Cooldown > Parameters.WaitingForComboTime)
-            {
-                _attackingState = 0;
-                _accumTime = 0f;
-                AttackStopped?.Invoke();
-            }
-            else if (_attackingState == 3 && _accumTime >= Parameters.AttackComboCooldown)
-            {
-                _attackingState = 0;
-                _accumTime = 0f;
-                AttackStopped?.Invoke();
-            }
+            for (int i = 0; i < Params.AttackComboElements.Length - 1; i++)
+                if (_attackComboNumber == i + 1 && _accumTime - Params.AttackComboElements[i].Cooldown > Params.WaitingForComboTime)
+                    StopAttack();
+
+            if (_attackComboNumber == 3 && _accumTime >= Params.AttackComboElements[^1].Cooldown)
+                StopAttack();
         }
 
         protected override void Attack()
         {
-            if (_attackingState == 0)
+            if (_groundDetector.IsOnGround)
             {
-                AttackCombo1();
-            }
-            else if (_attackingState == 1 && _accumTime >= Parameters.AttackCombo1Cooldown)
-            {
-                AttackCombo2();
-                _accumTime = 0f;
-            }
-            else if (_attackingState == 2 && _accumTime >= Parameters.AttackCombo2Cooldown)
-            {
-                AttackCombo3();
-                _accumTime = 0f;
+                AttackCombo();
+
+                if (_accumTime >= Params.AttackComboElements[_attackComboNumber - 1].Cooldown)
+                    _accumTime = 0f;
             }
         }
 
-        private void AttackCombo1()
+        private void AttackCombo()
         {
-            _attackingState = 1;
-            AttackStarted?.Invoke();
-            AttackingCombo1?.Invoke();
+            _attackComboNumber = (_attackComboNumber + 1) % (AttackingCombo.Length + 1);
+
+            if (_attackComboNumber == 1)
+                AttackStarted?.Invoke();
+
+            AttackingCombo[_attackComboNumber - 1].Invoke(_attackComboNumber);
         }
 
-        private void AttackCombo2()
+        private void StopAttack()
         {
-            _attackingState = 2;
-            AttackingCombo2?.Invoke();
-        }
-
-        private void AttackCombo3()
-        {
-            _attackingState = 3;
-            AttackingCombo3?.Invoke();
+            _attackComboNumber = 0;
+            _accumTime = 0f;
+            AttackStopped?.Invoke(Input.PlayerCharacterVelocity != Vector2.zero);
         }
     }
 }

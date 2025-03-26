@@ -1,4 +1,5 @@
 using StructureElements;
+using System;
 using UnityEngine;
 
 namespace PlayerControl
@@ -10,7 +11,6 @@ namespace PlayerControl
 
         public void SetWalkingAnimation(bool isWalking)
         {
-            _animator.SetBool(PlayerAnimatorData.Params.IsAttacking, false);
             _animator.SetBool(PlayerAnimatorData.Params.IsWalking, isWalking);
         }
 
@@ -21,32 +21,35 @@ namespace PlayerControl
 
         public void SetJumpingAnimation()
         {
+            _animator.SetBool(PlayerAnimatorData.Params.IsOnGround, false);
             _animator.SetTrigger(PlayerAnimatorData.Params.Jumping);
         }
 
         public void SetAttackingState()
         {
+            _animator.SetBool(PlayerAnimatorData.Params.IsWalking, false);
             _animator.SetBool(PlayerAnimatorData.Params.IsAttacking, true);
         }
 
-        public void RemoveAttackingState()
+        public void RemoveAttackingState(bool isWalking)
         {
+            _animator.SetBool(PlayerAnimatorData.Params.IsWalking, isWalking);
             _animator.SetBool(PlayerAnimatorData.Params.IsAttacking, false);
         }
 
-        public void SetAttackCombo1Animation()
+        public void SetAttackComboAnimation(int attackComboNumber)
         {
-            _animator.SetTrigger(PlayerAnimatorData.Params.AttackingCombo1);
+            _animator.SetTrigger(PlayerAnimatorData.Params.AttackingCombo[attackComboNumber - 1]);
         }
 
-        public void SetAttackCombo2Animation()
+        public void SetGroundedState()
         {
-            _animator.SetTrigger(PlayerAnimatorData.Params.AttackingCombo2);
+            _animator.SetBool(PlayerAnimatorData.Params.IsOnGround, true);
         }
 
-        public void SetAttackCombo3Animation()
+        public void SetSoaringState(float verticalVelocity)
         {
-            _animator.SetTrigger(PlayerAnimatorData.Params.AttackingCombo3);
+            _animator.SetFloat(PlayerAnimatorData.Params.VerticalVelocity, verticalVelocity);
         }
     }
 }

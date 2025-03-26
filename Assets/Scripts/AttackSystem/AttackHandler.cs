@@ -7,15 +7,16 @@ namespace AttackSystem
     public abstract class AttackHandler : IActivatable
     {
         private InputController _input;
-        private CharacterParameters _parameters;
+        private CharacterParameters _params;
 
         public AttackHandler(InputController input, CharacterParameters parameters)
         {
             _input = input;
-            _parameters = parameters;
+            _params = parameters;
         }
 
-        protected CharacterParameters Parameters => _parameters;
+        protected CharacterParameters Params => _params;
+        protected InputController Input => _input;
 
         public void Enable()
         {

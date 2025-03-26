@@ -468,6 +468,8 @@ MonoBehaviour:
   _input: {fileID: 756557221}
   _player: {fileID: 1180207155}
   _playerParameters: {fileID: 11400000, guid: c89219e9a38d94d4f97ce151ef5c2080, type: 2}
+  _playerGroundDetector: {fileID: 394615360}
+  _playerRigidbody: {fileID: 1180207152}
 --- !u!4 &756557223
 Transform:
   m_ObjectHideFlags: 0
@@ -1691,7 +1693,7 @@ CompositeCollider2D:
   m_GameObject: {fileID: 2089955092}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: a915c1aa5f8e3f247ac7fb8cdf7c9467, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

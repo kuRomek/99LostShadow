@@ -15,10 +15,11 @@ MonoBehaviour:
   _movementSpeed: 3.5
   _jumpForce: 13
   _baseAttackDamage: 5
-  _attackCombo1DamageMultiplier: 0.75
-  _attackCombo2DamageMultiplier: 0.6
-  _attackCombo3DamageMultiplier: 0.9
-  _attackCombo1Cooldown: 0.5
-  _attackCombo2Cooldown: 0.5
-  _attackComboCooldown: 1
+  _attackComboElements:
+  - _baseDamagePortion: 0.8
+    _cooldown: 0.5
+  - _baseDamagePortion: 0.7
+    _cooldown: 0.5
+  - _baseDamagePortion: 1.1
+    _cooldown: 1
   _waitingForComboTime: 0.2

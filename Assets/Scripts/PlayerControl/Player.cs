@@ -1,6 +1,6 @@
 using Input;
+using Misc;
 using StructureElements;
-using System;
 using UnityEngine;
 
 namespace PlayerControl
@@ -8,23 +8,23 @@ namespace PlayerControl
     public class Player : Transformable, IActivatable, IUpdatable, IFixedUpdatable
     {
         private readonly InputController _input;
-        private readonly PlayerParameters _parameters;
+        private readonly PlayerParameters _params;
         private readonly PlayerAttackHandler _attackHandler;
-        private Vector2 _lastFrameVelocity = Vector2.zero;
-
-        public Player(InputController input, PlayerParameters parameters, Vector2 startPosition) :
+        private readonly GroundDetector _groundDetector;
+        private readonly PlayerMovement _movement;
+        
+        public Player(InputController input, PlayerParameters parameters, GroundDetector groundDetector, Rigidbody2D rigidbody, Vector2 startPosition) :
             base(position: startPosition)
         {
             _input = input;
-            _parameters = parameters;
-            _attackHandler = new PlayerAttackHandler(_input, _parameters);
+            _params = parameters;
+            _groundDetector = groundDetector;
+            _attackHandler = new PlayerAttackHandler(_input, _params, groundDetector);
+            _movement = new PlayerMovement(_input, _params, groundDetector, rigidbody);
         }
 
-        public event Action<float> Jumped;
-        public event Action<bool> WalkingStateChanged;
-        public event Action<bool> LookedLeft;
-
         public PlayerAttackHandler AttackHandler => _attackHandler;
+        public PlayerMovement Movement => _movement;
 
         public void Update(float deltaTime)
         {
@@ -33,33 +33,19 @@ namespace PlayerControl
 
         public void FixedUpdate(float deltaTime)
         {
-            MoveTo(Position + _parameters.MovementSpeed * deltaTime * _input.PlayerCharacterVelocity);
-
-            if (_input.PlayerCharacterVelocity != _lastFrameVelocity)
-                WalkingStateChanged?.Invoke(_input.PlayerCharacterVelocity != Vector2.zero);
-
-            LookedLeft?.Invoke(_input.PlayerCharacterVelocity.x < 0);
-
-            _lastFrameVelocity = _input.PlayerCharacterVelocity;
+            _movement.FixedUpdate(deltaTime);
         }
 
         public void Enable()
         {
             _attackHandler.Enable();
-
-            _input.Jumping += Jump;
+            _movement.Enable();
         }
 
         public void Disable()
         {
             _attackHandler.Disable();
-
-            _input.Jumping -= Jump;
-        }
-
-        private void Jump()
-        {
-            Jumped?.Invoke(_parameters.JumpForce);
+            _movement.Disable();
         }
     }
 }

@@ -2,7 +2,7 @@ using Misc;
 using StructureElements;
 using UnityEngine;
 
-namespace Characters
+namespace CharacterControl
 {
     public class CharacterView : View
     {

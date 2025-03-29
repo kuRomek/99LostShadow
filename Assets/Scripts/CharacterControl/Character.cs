@@ -4,7 +4,7 @@ using MovementSystem;
 using StructureElements;
 using UnityEngine;
 
-namespace Characters
+namespace CharacterControl
 {
     public abstract class Character : Transformable, IFixedUpdatable, IDamageable
     {
@@ -32,9 +32,7 @@ namespace Characters
 
         public virtual void FixedUpdate(float deltaTime)
         {
-            _movement.UpdateVelocity(
-                Vector2.left,
-                _groundDetector.IsOnGround);
+            _movement.Update(Vector2.left, _groundDetector.IsOnGround);
         }
 
         public void TakeDamage(int amount)

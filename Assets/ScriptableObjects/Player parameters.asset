@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df7d6785067644c40a09a84689c8ed96, type: 3}
   m_Name: Player parameters
   m_EditorClassIdentifier: 
+  _maxHealth: 100
   _movementSpeed: 3.5
   _jumpForce: 13
-  _baseAttackDamage: 5
+  _baseAttackDamage: 30
   _attackComboElements:
   - _baseDamagePortion: 0.8
     _cooldown: 0.5

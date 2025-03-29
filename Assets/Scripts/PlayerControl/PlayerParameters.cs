@@ -1,5 +1,5 @@
 using AttackSystem;
-using Characters;
+using CharacterControl;
 using UnityEngine;
 
 namespace PlayerControl

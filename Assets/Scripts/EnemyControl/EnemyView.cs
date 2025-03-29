@@ -1,10 +1,9 @@
 using CharacterControl;
 using Misc;
-using UnityEngine;
 
-namespace PlayerControl
+namespace EnemyControl
 {
-    public class PlayerView : CharacterView
+    public class EnemyView : CharacterView
     {
         public void SetAttackingState()
         {
@@ -15,11 +14,6 @@ namespace PlayerControl
         public void RemoveAttackingState()
         {
             Animator.SetBool(AnimatorData.Params.IsAttacking, false);
-        }
-
-        public void SetAttackComboAnimation(int attackComboNumber)
-        {
-            Animator.SetTrigger(AnimatorData.Params.AttackingCombo[attackComboNumber - 1]);
         }
     }
 }

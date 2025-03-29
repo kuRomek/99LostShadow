@@ -1,11 +1,11 @@
 using CharacterControl;
 
-namespace PlayerControl
+namespace EnemyControl
 {
-    public class PlayerPresenter : CharacterPresenter
+    public class EnemyPresenter : CharacterPresenter
     {
-        public new Player Model => base.Model as Player;
-        public new PlayerView View => base.View as PlayerView;
+        public new Enemy Model => base.Model as Enemy;
+        public new EnemyView View => base.View as EnemyView;
 
         public override void Enable()
         {
@@ -18,16 +18,13 @@ namespace PlayerControl
                 Model.Movement.Soaring += View.SetSoaringState;
                 Model.AttackHandler.AttackStarted += View.SetAttackingState;
                 Model.AttackHandler.AttackStopped += View.RemoveAttackingState;
-            
-                for (int i = 0; i < Model.AttackHandler.AttackingCombo.Length; i++)
-                    Model.AttackHandler.AttackingCombo[i] += View.SetAttackComboAnimation;
             }
         }
 
         public override void Disable()
         {
             base.Disable();
-            
+
             if (Model != null)
             {
                 Model.Movement.WalkingStateChanged -= View.SetWalkingAnimation;
@@ -35,9 +32,6 @@ namespace PlayerControl
                 Model.Movement.Soaring -= View.SetSoaringState;
                 Model.AttackHandler.AttackStarted -= View.SetAttackingState;
                 Model.AttackHandler.AttackStopped -= View.RemoveAttackingState;
-
-                for (int i = 0; i < Model.AttackHandler.AttackingCombo.Length; i++)
-                    Model.AttackHandler.AttackingCombo[i] -= View.SetAttackComboAnimation;
             }
         }
     }

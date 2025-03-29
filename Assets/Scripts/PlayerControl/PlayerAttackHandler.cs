@@ -24,7 +24,7 @@ namespace PlayerControl
         }
 
         public event Action AttackStarted;
-        public event Action<bool> AttackStopped;
+        public event Action AttackStopped;
         public EventElement<int>[] AttackingCombo;
 
         public int AttackingState { get; private set; } = 0;
@@ -50,7 +50,7 @@ namespace PlayerControl
             }
         }
 
-        public void UpdateCooldown(float deltaTime, bool isCharacterMoving)
+        public void UpdateCooldown(float deltaTime)
         {
             if (AttackingState != 0)
             {
@@ -62,26 +62,26 @@ namespace PlayerControl
                 if (AttackingState == Params.AttackComboElements.Length + 1)
                 {
                     if (_groundDetector.IsOnGround)
-                        StopAttack(isCharacterMoving);
+                        StopAttack();
                 }
                 else if (AttackingState == Params.AttackComboElements.Length)
                 {
                     if (_accumTime >= Params.AttackComboElements[^1].Cooldown)
-                        StopAttack(isCharacterMoving);
+                        StopAttack();
                 }
                 else if (_accumTime - Params.AttackComboElements[AttackingState - 1].Cooldown > Params.WaitingForComboTime)
                 {
-                    StopAttack(isCharacterMoving);
+                    StopAttack();
                 }
             }
         }
 
-        public void StopAttack(bool isCharacterMoving)
+        public void StopAttack()
         {
             AttackingState = 0;
             _accumTime = 0f;
             _attackTrigger.enabled = false;
-            AttackStopped?.Invoke(isCharacterMoving);
+            AttackStopped?.Invoke();
         }
 
         private void AttackInJump()

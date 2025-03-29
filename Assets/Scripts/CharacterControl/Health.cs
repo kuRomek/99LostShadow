@@ -1,6 +1,6 @@
 using System;
 
-namespace Characters
+namespace CharacterControl
 {
     public class Health
     {

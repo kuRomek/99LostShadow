@@ -1,4 +1,4 @@
-using Characters;
+using CharacterControl;
 using Input;
 using Misc;
 using StructureElements;
@@ -12,7 +12,6 @@ namespace PlayerControl
         private readonly InputController _input;
         private readonly PlayerAttackHandler _attackHandler;
         private readonly Action _jumpingDelegate;
-        private readonly Action _stoppingAttackDelegate;
         
         public Player(
             InputController input,
@@ -26,7 +25,6 @@ namespace PlayerControl
             _input = input;
             _attackHandler = new PlayerAttackHandler(parameters, attackTrigger, groundDetector);
             _jumpingDelegate = () => Movement.Jump(groundDetector.IsOnGround);
-            _stoppingAttackDelegate = () => _attackHandler.StopAttack(_input.PlayerCharacterVelocity != Vector2.zero);
         }
 
         public PlayerAttackHandler AttackHandler => _attackHandler;
@@ -34,12 +32,12 @@ namespace PlayerControl
 
         public void Update(float deltaTime)
         {
-            _attackHandler.UpdateCooldown(deltaTime, _input.PlayerCharacterVelocity != Vector2.zero);
+            _attackHandler.UpdateCooldown(deltaTime);
         }
 
         public override void FixedUpdate(float deltaTime)
         {
-            Movement.UpdateVelocity(
+            Movement.Update(
                 _input.PlayerCharacterVelocity,
                 GroundDetector.IsOnGround,
                 _attackHandler.AttackingState != 0 && _attackHandler.AttackingState != 4);
@@ -49,14 +47,14 @@ namespace PlayerControl
         {
             _input.Attacking += _attackHandler.Attack;
             _input.Jumping += _jumpingDelegate;
-            Movement.Jumped += _stoppingAttackDelegate;
+            Movement.Jumped += _attackHandler.StopAttack;
         }
 
         public void Disable()
         {
             _input.Attacking -= _attackHandler.Attack;
             _input.Jumping -= _jumpingDelegate;
-            Movement.Jumped -= _stoppingAttackDelegate;
+            Movement.Jumped -= _attackHandler.StopAttack;
         }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Characters
+namespace CharacterControl
 {
     [CreateAssetMenu(fileName = "Character parameters", menuName = "Custom objects/Character parameters", order = 51)]
     public class CharacterParameters : ScriptableObject

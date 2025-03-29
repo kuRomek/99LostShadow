@@ -1,5 +1,6 @@
-using Characters;
+using CharacterControl;
 using MovementSystem;
+using System;
 using UnityEngine;
 
 namespace PlayerControl
@@ -10,12 +11,28 @@ namespace PlayerControl
         {
         }
 
-        public void UpdateVelocity(Vector2 inputVelocity, bool isOnGround, bool isAttackingOnGround)
+        public event Action<bool> WalkingStateChanged;
+        public event Action<float> Soaring;
+        public event Action<bool> LookedLeft;
+
+        public override void Update(Vector2 inputVelocity, bool isOnGround, bool isAttackingOnGround = false)
         {
             if (isAttackingOnGround)
+            {
                 Rigidbody.velocity = new Vector2(0f, Rigidbody.velocity.y);
+            }
             else
-                UpdateVelocity(inputVelocity, isOnGround);
+            {
+                Rigidbody.velocity = new Vector2(Params.MovementSpeed * inputVelocity.x, Rigidbody.velocity.y);
+
+                if (isOnGround)
+                    WalkingStateChanged?.Invoke(inputVelocity != Vector2.zero);
+                else
+                    Soaring?.Invoke(Rigidbody.velocity.y);
+
+                if (inputVelocity != Vector2.zero)
+                    LookedLeft?.Invoke(inputVelocity.x < 0);
+            }
         }
     }
 }

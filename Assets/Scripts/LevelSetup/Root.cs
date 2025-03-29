@@ -3,16 +3,26 @@ using Misc;
 using PlayerControl;
 using UnityEngine;
 
-public class Root : MonoBehaviour
+namespace LevelSetup
 {
-    [SerializeField] private InputController _input;
-    [SerializeField] private PlayerPresenter _player;
-    [SerializeField] private PlayerParameters _playerParameters;
-    [SerializeField] private GroundDetector _playerGroundDetector;
-    [SerializeField] private Rigidbody2D _playerRigidbody;
-
-    private void Awake()
+    public class Root : MonoBehaviour
     {
-        _player.Init(new Player(_input, _playerParameters, _playerGroundDetector, _playerRigidbody, _player.transform.position));
+        [SerializeField] private InputController _input;
+        [SerializeField] private PlayerPresenter _player;
+        [SerializeField] private PlayerParameters _playerParameters;
+        [SerializeField] private GroundDetector _playerGroundDetector;
+        [SerializeField] private CircleCollider2D _playerAttackTrigger;
+        [SerializeField] private Rigidbody2D _playerRigidbody;
+
+        private void Awake()
+        {
+            _player.Init(new Player(
+                _input,
+                _playerAttackTrigger,
+                _playerParameters,
+                _playerGroundDetector,
+                new PlayerMovement(_playerParameters, _playerRigidbody),
+                _player.transform.position));
+        }
     }
 }

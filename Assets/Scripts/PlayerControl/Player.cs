@@ -1,51 +1,62 @@
+using Characters;
 using Input;
 using Misc;
 using StructureElements;
+using System;
 using UnityEngine;
 
 namespace PlayerControl
 {
-    public class Player : Transformable, IActivatable, IUpdatable, IFixedUpdatable
+    public class Player : Character, IUpdatable, IActivatable
     {
         private readonly InputController _input;
-        private readonly PlayerParameters _params;
         private readonly PlayerAttackHandler _attackHandler;
-        private readonly GroundDetector _groundDetector;
-        private readonly PlayerMovement _movement;
+        private readonly Action _jumpingDelegate;
+        private readonly Action _stoppingAttackDelegate;
         
-        public Player(InputController input, PlayerParameters parameters, GroundDetector groundDetector, Rigidbody2D rigidbody, Vector2 startPosition) :
-            base(position: startPosition)
+        public Player(
+            InputController input,
+            CircleCollider2D attackTrigger,
+            PlayerParameters parameters,
+            GroundDetector groundDetector,
+            PlayerMovement movement,
+            Vector2 startPosition) :
+            base(parameters, movement, groundDetector, startPosition)
         {
             _input = input;
-            _params = parameters;
-            _groundDetector = groundDetector;
-            _attackHandler = new PlayerAttackHandler(_input, _params, groundDetector);
-            _movement = new PlayerMovement(_input, _params, groundDetector, rigidbody);
+            _attackHandler = new PlayerAttackHandler(parameters, attackTrigger, groundDetector);
+            _jumpingDelegate = () => Movement.Jump(groundDetector.IsOnGround);
+            _stoppingAttackDelegate = () => _attackHandler.StopAttack(_input.PlayerCharacterVelocity != Vector2.zero);
         }
 
         public PlayerAttackHandler AttackHandler => _attackHandler;
-        public PlayerMovement Movement => _movement;
+        public new PlayerMovement Movement => base.Movement as PlayerMovement;
 
         public void Update(float deltaTime)
         {
-            _attackHandler.Update(deltaTime);
+            _attackHandler.UpdateCooldown(deltaTime, _input.PlayerCharacterVelocity != Vector2.zero);
         }
 
-        public void FixedUpdate(float deltaTime)
+        public override void FixedUpdate(float deltaTime)
         {
-            _movement.FixedUpdate(deltaTime);
+            Movement.UpdateVelocity(
+                _input.PlayerCharacterVelocity,
+                GroundDetector.IsOnGround,
+                _attackHandler.AttackingState != 0 && _attackHandler.AttackingState != 4);
         }
 
         public void Enable()
         {
-            _attackHandler.Enable();
-            _movement.Enable();
+            _input.Attacking += _attackHandler.Attack;
+            _input.Jumping += _jumpingDelegate;
+            Movement.Jumped += _stoppingAttackDelegate;
         }
 
         public void Disable()
         {
-            _attackHandler.Disable();
-            _movement.Disable();
+            _input.Attacking -= _attackHandler.Attack;
+            _input.Jumping -= _jumpingDelegate;
+            Movement.Jumped -= _stoppingAttackDelegate;
         }
     }
 }

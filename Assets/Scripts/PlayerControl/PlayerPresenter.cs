@@ -1,30 +1,16 @@
-using Misc;
-using StructureElements;
-using UnityEngine;
+using Characters;
 
 namespace PlayerControl
 {
-    public class PlayerPresenter : Presenter, IActivatable
+    public class PlayerPresenter : CharacterPresenter
     {
-        [SerializeField] private GroundDetector _groundDetector;
-        [SerializeField] private Rigidbody2D _rigidbody;
-
         public new Player Model => base.Model as Player;
         public new PlayerView View => base.View as PlayerView;
 
-        private void Awake()
+        public override void Enable()
         {
-            if (Model == null)
-                enabled = false;
-        }
+            base.Enable();
 
-        public void Enable()
-        {
-            Model.Movement.WalkingStateChanged += View.SetWalkingAnimation;
-            Model.Movement.LookedLeft += View.MirrorSprite;
-            Model.Movement.Jumped += View.SetJumpingAnimation;
-            Model.Movement.Soaring += View.SetSoaringState;
-            _groundDetector.HasGrounded += View.SetGroundedState;
             Model.AttackHandler.AttackStarted += View.SetAttackingState;
             Model.AttackHandler.AttackStopped += View.RemoveAttackingState;
             
@@ -32,13 +18,10 @@ namespace PlayerControl
                 Model.AttackHandler.AttackingCombo[i] += View.SetAttackComboAnimation;
         }
 
-        public void Disable()
+        public override void Disable()
         {
-            Model.Movement.WalkingStateChanged -= View.SetWalkingAnimation;
-            Model.Movement.LookedLeft -= View.MirrorSprite;
-            Model.Movement.Jumped -= View.SetJumpingAnimation;
-            Model.Movement.Soaring -= View.SetSoaringState;
-            _groundDetector.HasGrounded -= View.SetGroundedState;
+            base.Disable();
+
             Model.AttackHandler.AttackStarted -= View.SetAttackingState;
             Model.AttackHandler.AttackStopped -= View.RemoveAttackingState;
 
